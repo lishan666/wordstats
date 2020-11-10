@@ -51,6 +51,11 @@ def find_txt(folder, files):
 
 
 def creat_time_folder(root_path):
+    """
+   功能：在指定文件路径下，新建一个以时间命名的文件夹
+       root_path:指定文件夹路径
+       path:返回的最终路径
+   """
     # 获取当前时间
     now = time.strftime("%Y-%m-%d_%H-%M", time.localtime(time.time()))
     # 生成统计结果保存的文件名
@@ -59,6 +64,7 @@ def creat_time_folder(root_path):
         pass
     else:
         os.makedirs(path)
+    return path
 
 
 class WordStats:
@@ -81,28 +87,36 @@ class WordStats:
         self.ui.button_loadfolder.clicked.connect(self.button_load_folder_handle_calc)
 
     def button_stats_para_handle_calc(self):
-        path = self.path
-        creat_time_folder(path)
+        self.ui.progressBar.setRange(0, 5)
+        path = creat_time_folder(self.path)
+        self.path = path
         self.combine = path + txt_file_name
         self.result = path + result_file_name
+        self.ui.progressBar.setValue(0)
         content = self.ui.plainTextEdit.toPlainText()
         self.content = content.lower()
+        self.ui.progressBar.setValue(1)
         WordStats.stat_freq(self)
         self.ui.textBrowser_result.clear()
         WordStats.preview_result(self)
+        self.ui.progressBar.setValue(5)
         QMessageBox.about(self.ui,
                           '统计结束', '前往result目录查看详细结果')
 
     def button_stats_file_handle_calc(self):
-        path = self.path
-        creat_time_folder(path)
+        self.ui.progressBar.setRange(0, 5)
+        path = creat_time_folder(self.path)
+        self.path = path
         self.combine = path + txt_file_name
         self.result = path + result_file_name
+        self.ui.progressBar.setValue(0)
         WordStats.combine_txt(self)
         self.content = WordStats.gettext(self.combine)
+        self.ui.progressBar.setValue(1)
         WordStats.stat_freq(self)
         self.ui.textBrowser_result.clear()
         WordStats.preview_result(self)
+        self.ui.progressBar.setValue(5)
         QMessageBox.about(self.ui,
                           '统计结束', '前往result目录查看详细结果')
 
@@ -177,6 +191,7 @@ class WordStats:
             counts[word] = counts.get(word, 0) + 1
         items = list(counts.items())
         items.sort(key=lambda w: w[1], reverse=True)
+        self.ui.progressBar.setValue(2)
         f = open(result_name, 'w', encoding='utf-8')
         f.writelines("{0:<6}\t{1:<20}\t{2:<20}\t{3:<6}\t{4:<5}\t{5:>5}".format
                      ("No",
@@ -214,8 +229,8 @@ class WordStats:
             f.writelines("{0:<6}\t{1:<20}\t{2:<20}\t{3:<6}\t{4:.4%}\t{5:.4%}".format
                          (i + 1,
                           word,
-                          # translate(word),
-                          " ",
+                          # translate(word),  # 此语句可以对英语单词进行翻译
+                          " ",                # 此语句不进行翻译，翻译部分显示为空
                           count,
                           freq,
                           cum_freq))
@@ -225,6 +240,7 @@ class WordStats:
             cum_fre.append(cum_freq * 100)
         # 关闭文件
         f.close()
+        self.ui.progressBar.setValue(3)
 
         cnt_len = len(cnt)
         # 绘制频率图
@@ -251,6 +267,7 @@ class WordStats:
         for k in result:
             key.append(k)
             value.append(result[k])
+        self.ui.progressBar.setValue(4)
 
 
 if __name__ == "__main__":

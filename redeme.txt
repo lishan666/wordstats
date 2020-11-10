@@ -1,0 +1,10 @@
+本程序实现了对英语词频进行统计的功能，并基于Qt开发了GUI界面
+主要分为两种模式：
+1、一段文本统计
+2、文件夹（含多个txt文件）统计
+统计结果存放在result文件夹下
+
+
+打包exe命令
+    pyinstaller main.py --noconsole --hidden-import PySide2.QtXml
+
